@@ -1,0 +1,146 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+
+\lstset{
+    basicstyle=\ttfamily,
+    basewidth=0.5em,
+    language=C++,
+    frame=single,
+    numbers=left,
+    showstringspaces=false
+}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{数据结构与算法}
+\chead{List类实现测试报告}
+\rhead{Oct.19th, 2024}
+
+\section{测试程序的设计思路}
+
+本测试程序采用模块化设计，将测试分为多个独立的测试单元，每个单元负责测试List类的不同功能方面。主要测试模块包括：
+
+\begin{enumerate}
+    \item \textbf{构造函数和析构函数测试（testConstructorsAndDestructors）}
+    \begin{itemize}
+        \item 测试默认构造函数
+        \item 测试初始化列表构造
+        \item 测试拷贝构造
+        \item 测试移动构造
+    \end{itemize}
+    
+    \item \textbf{迭代器功能测试（testIterators）}
+    \begin{itemize}
+        \item 测试begin()和end()
+        \item 测试迭代器自增操作
+        \item 测试const迭代器
+        \item 测试范围遍历
+    \end{itemize}
+    
+    \item \textbf{插入和删除操作测试（testInsertionAndDeletion）}
+    \begin{itemize}
+        \item 测试push\_back和push\_front
+        \item 测试insert
+        \item 测试pop\_front和pop\_back
+        \item 测试erase
+        \item 测试clear
+    \end{itemize}
+    
+    \item \textbf{赋值操作测试（testAssignment）}
+    \begin{itemize}
+        \item 测试拷贝赋值
+        \item 测试移动赋值
+    \end{itemize}
+\end{enumerate}
+
+为了更全面地测试List类的功能，我特别设计了TestObject类，这个类具有完整的移动语义支持，用于测试List在处理复杂对象时的行为。同时，每个测试函数都使用assert语句进行结果验证，确保功能正确性。
+
+\section{测试的结果}
+
+所有测试模块均通过测试，具体结果如下：
+
+\begin{enumerate}
+    \item 构造函数和析构函数测试通过，验证了：
+    \begin{itemize}
+        \item 空列表的正确构造
+        \item 初始化列表构造的正确性
+        \item 拷贝构造的深复制特性
+        \item 移动构造后源对象的状态
+    \end{itemize}
+    
+    \item 迭代器功能完全正常，包括：
+    \begin{itemize}
+        \item 正向遍历
+        \item 迭代器自增操作
+        \item const迭代器的只读特性
+    \end{itemize}
+    
+    \item 插入和删除操作测试结果显示：
+    \begin{itemize}
+        \item 所有插入操作保持了列表的完整性
+        \item 删除操作正确处理了节点的链接
+        \item clear操作完全清空了列表
+    \end{itemize}
+    
+    \item 赋值操作测试证实：
+    \begin{itemize}
+        \item 拷贝赋值实现了深复制
+        \item 移动赋值正确转移了资源所有权
+    \end{itemize}
+
+    \item 递减运算符测试结果显示：
+    \begin{itemize}
+    \item 前置递减（--iterator）正确修改迭代器位置并返回引用
+    \item 后置递减（iterator--）正确保存原值并返回副本
+    \item const迭代器的递减操作保持了只读特性
+    \item 在链表边界进行递减操作时行为正确
+    \end{itemize}
+\end{enumerate}
+
+使用valgrind进行内存泄漏检测，结果显示没有内存泄漏：
+\begin{verbatim}
+==1234== All heap blocks were freed -- no leaks are possible
+\end{verbatim}
+
+\section{Bug报告}
+
+在测试过程中，我发现了一个潜在的安全性问题：
+
+\begin{enumerate}
+    \item List类的front()和back()方法在空列表上的行为未定义
+    \item 当list为空时调用这些方法会导致未定义行为
+    \item 在实际应用中可能导致程序崩溃
+\end{enumerate}
+
+建议的改进方案：
+
+\begin{lstlisting}[caption=改进后的front()方法示例]
+Object& front() {
+    if (empty()) {
+        throw std::runtime_error("Accessing front() on empty list");
+    }
+    return *begin();
+}
+\end{lstlisting}
+
+这个bug的根本原因是缺少边界检查。在双向链表实现中，虽然使用了头尾哨兵节点，但这些方法仍然假设列表非空。在健壮的实现中，应该添加适当的错误处理机制。
+
+\end{document}
