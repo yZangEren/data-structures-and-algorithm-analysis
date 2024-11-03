@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2024.10.19)  3 NOV 2024 21:53
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2024.10.19)  3 NOV 2024 22:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -671,11 +671,11 @@ Package fontspec Info: Font family 'FandolFang-Regular(0)' created for font
 (fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
 
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.53937> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 70.
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 69.
 
 LaTeX Font Warning: Font shape `TU/FandolFang-Regular(0)/m/it' undefined
 (Font)              using `TU/FandolFang-Regular(0)/m/n' instead on input line 
-73.
+72.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -713,7 +713,7 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Here is how much of TeX's memory you used:
  12171 strings out of 477756
  290641 string characters out of 5843517
- 955421 words of memory out of 5000000
+ 955400 words of memory out of 5000000
  32666 multiletter control sequences out of 15000+600000
  471101 words of font info for 55 fonts, out of 8000000 for 9000
  264 hyphenation exceptions out of 8191
