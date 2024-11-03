@@ -1,0 +1,178 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+% useful packages.
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+
+\lstset{
+    basicstyle=\ttfamily, basewidth=0.5em,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=single,
+    showstringspaces=false
+}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\lhead{姓名：臧熠, 学号：3230102001}
+\chead{二叉搜索树删除操作测试报告}
+\rhead{\today}
+
+\section{测试程序的设计思路}
+
+本测试程序主要针对二叉搜索树的删除操作进行全面测试，测试用例的设计覆盖了以下几个主要方面：
+
+\begin{enumerate}
+    \item 基础功能测试
+    \begin{itemize}
+        \item 空树的删除操作
+        \item 叶子节点的删除
+        \item 只有一个子节点的节点删除
+        \item 有两个子节点的节点删除
+    \end{itemize}
+    
+    \item 特殊情况测试
+    \begin{itemize}
+        \item 删除不存在的节点
+        \item 连续右子树的情况
+        \item 连续左子树的情况
+    \end{itemize}
+    
+    \item 完整性测试
+    \begin{itemize}
+        \item 删除所有节点
+        \item 树的空状态验证
+    \end{itemize}
+\end{enumerate}
+
+\section{测试程序实现}
+
+测试程序的核心代码如下：
+
+\begin{lstlisting}[language=C++]
+int main() {
+    BinarySearchTree<int> bst;
+
+    // 测试1：删除空树中的节点
+    bst.remove(10);
+
+    // 测试2：构建基本测试树
+    bst.insert(50);  // 根节点
+    bst.insert(30);  // 左子树
+    bst.insert(70);  // 右子树
+    bst.insert(20);  // 左左子树
+    bst.insert(40);  // 左右子树
+    bst.insert(60);  // 右左子树
+    bst.insert(80);  // 右右子树
+
+    // 测试3：删除叶子节点
+    bst.remove(20);
+
+    // 测试4：删除只有一个子节点的节点
+    bst.remove(30);
+
+    // 测试5：删除有两个子节点的节点
+    bst.remove(50);
+
+    // 后续测试...
+}
+\end{lstlisting}
+
+\section{测试结果分析}
+
+\subsection{基本功能测试结果}
+
+\begin{enumerate}
+    \item 空树测试（测试1）
+    \begin{lstlisting}
+=== 测试1：删除空树中的节点 ===
+树的内容：
+Empty tree
+是否为空：是
+    \end{lstlisting}
+    结果显示程序正确处理了空树的情况。
+
+    \item 树的构建（测试2）
+    \begin{lstlisting}
+=== 测试2：插入节点构建树 ===
+树的内容：
+20 30 40 50 60 70 80
+是否为空：否
+    \end{lstlisting}
+    中序遍历结果显示树的构建符合二叉搜索树的性质。
+
+    \item 删除操作测试（测试3-5）
+    \begin{itemize}
+        \item 叶子节点的删除（测试3）成功移除了节点20
+        \item 单子节点的删除（测试4）成功处理了节点30的删除
+        \item 双子节点的删除（测试5）正确处理了节点50的删除并保持了树的结构
+    \end{itemize}
+\end{enumerate}
+
+\subsection{特殊情况测试结果}
+
+\begin{enumerate}
+    \item 删除不存在节点（测试6）
+    \begin{lstlisting}
+=== 测试6：删除不存在的节点(100) ===
+树的内容：
+40 60 70 80
+是否为空：否
+    \end{lstlisting}
+    结果显示树的结构未受影响。
+
+    \item 特殊树结构测试（测试8-9）
+    \begin{lstlisting}
+=== 测试8：特殊情况 - 连续右子树 ===
+树的内容：
+10 20 30
+...
+=== 测试9：特殊情况 - 连续左子树 ===
+树的内容：
+10 20 30
+    \end{lstlisting}
+    结果显示程序能正确处理极端的树结构情况。
+\end{enumerate}
+
+\section{改进建议}
+
+基于测试结果，提出以下改进建议：
+
+\begin{enumerate}
+    \item 添加层次遍历输出功能，以更直观地显示树的结构
+    \item 在删除操作后增加查找测试，验证树的查找功能完整性
+    \item 添加树高度验证，确保删除操作后树的平衡性
+    \item 增加更多边界测试用例
+\end{enumerate}
+
+\section{结论}
+
+通过全面的测试，我们可以得出以下结论：
+
+\begin{enumerate}
+    \item 删除操作能正确处理所有基本情况
+    \item 边界条件（空树、不存在节点）被正确处理
+    \item 特殊的树结构（连续左/右子树）也能正确处理
+    \item 删除操作后树始终保持二叉搜索树的性质
+\end{enumerate}
+
+测试结果表明二叉搜索树的删除操作实现是正确和可靠的。
+
+\end{document}
