@@ -218,7 +218,7 @@ public:
         return *this;
     }
 
-private:
+protected:
     /**
      * @brief 二叉树节点结构体
      */
@@ -227,6 +227,7 @@ private:
         Comparable element; ///< 节点存储的元素
         BinaryNode *left;   ///< 左子节点指针
         BinaryNode *right;  ///< 右子节点指针
+        int height;         ///< 节点的高度
 
         /**
          * @brief 构造函数，接受常量引用
@@ -356,6 +357,52 @@ private:
         }
     }
 
+    int height(BinaryNode *t) const
+    {
+        return t == nullptr ? 0 : t->height;
+    }
+
+    void updateHeight(BinaryNode *t)
+    {
+        if (t != nullptr)
+        {
+            t->height = std::max(height(t->left), height(t->right)) + 1;
+        }
+    }
+
+    BinaryNode *rightRotate(BinaryNode *y)
+    {
+        BinaryNode *x = y->left;
+        BinaryNode *T2 = x->right;
+
+        x->right = y;
+        y->left = T2;
+
+        updateHeight(y);
+        updateHeight(x);
+
+        return x;
+    }
+
+    BinaryNode *leftRotate(BinaryNode *x)
+    {
+        BinaryNode *y = x->right;
+        BinaryNode *T2 = y->left;
+
+        y->left = x;
+        x->right = T2;
+
+        updateHeight(x);
+        updateHeight(y);
+
+        return y;
+    }
+
+    int getBalance(BinaryNode *t) const
+    {
+        return t == nullptr ? 0 : height(t->left) - height(t->right);
+    }
+
     /**
      * @brief 递归插入一个常量引用元素到树中
      *
@@ -364,56 +411,46 @@ private:
      */
     void insert(const Comparable &x, BinaryNode *&t)
     {
-        /// 这句话乍一看不可思异，怎么能对一个空指针赋值呢？
-        /// 但是这里是引用，所以实际上是对指针 t 的引用，t 现在存了 nullptr,
-        /// 所以可以修改指针 t 的值
         if (t == nullptr)
         {
-            /// 创建一个新节点，包含 x 的值，左右子节点为空
-            /// 挂在 t 指向的节点上
-            /// 而在递归过程中，t 总是会指向父节点的左子节点或右子节点
-            /// 所以这里实际上是将新节点挂在父节点的左子节点或右子节点上
             t = new BinaryNode{x, nullptr, nullptr};
+            return;
         }
-        else if (x < t->element)
-        {
-            insert(x, t->left);
-        }
-        else if (x > t->element)
-        {
-            insert(x, t->right);
-        }
-        else
-        {
-            /// 如果元素已存在，则不进行插入
-            /// 这种情况不可遗漏，严格的规则中也可以抛出异常
-        }
-    }
 
-    /**
-     * @brief 递归插入一个右值引用元素到树中
-     *
-     * @param x 要插入的元素
-     * @param t 当前节点指针
-     */
-    void insert(Comparable &&x, BinaryNode *&t)
-    {
-        /// 一样的逻辑
-        if (t == nullptr)
-        {
-            t = new BinaryNode{std::move(x), nullptr, nullptr};
-        }
-        else if (x < t->element)
-        {
-            insert(std::move(x), t->left);
-        }
+        if (x < t->element)
+            insert(x, t->left);
         else if (x > t->element)
-        {
-            insert(std::move(x), t->right);
-        }
+            insert(x, t->right);
         else
+            return;
+
+        // 更新高度
+        updateHeight(t);
+
+        // 获取平衡因子
+        int balance = getBalance(t);
+
+        // 执行必要的旋转操作
+        // 左左情况
+        if (balance > 1 && x < t->left->element)
+            t = rightRotate(t);
+
+        // 右右情况
+        if (balance < -1 && x > t->right->element)
+            t = leftRotate(t);
+
+        // 左右情况
+        if (balance > 1 && x > t->left->element)
         {
-            // 如果元素已存在，则不进行插入
+            t->left = leftRotate(t->left);
+            t = rightRotate(t);
+        }
+
+        // 右左情况
+        if (balance < -1 && x < t->right->element)
+        {
+            t->right = rightRotate(t->right);
+            t = leftRotate(t);
         }
     }
 
@@ -443,7 +480,7 @@ private:
     void remove(const Comparable &x, BinaryNode *&t)
     {
         if (t == nullptr)
-            return; // 元素不存在
+            return;
 
         if (x < t->element)
             remove(x, t->left);
@@ -451,32 +488,58 @@ private:
             remove(x, t->right);
         else
         {
-            // 找到要删除的节点
             if (t->left == nullptr)
-            { // 情况1：没有左子树
+            {
                 BinaryNode *oldNode = t;
                 t = t->right;
                 delete oldNode;
             }
             else if (t->right == nullptr)
-            { // 情况2：没有右子树
+            {
                 BinaryNode *oldNode = t;
                 t = t->left;
                 delete oldNode;
             }
             else
             {
-                // 情况3：有两个子节点
-                // 找到并分离右子树中的最小节点
                 BinaryNode *minNode = detachMin(t->right);
-                // 重组树结构
                 minNode->left = t->left;
                 minNode->right = t->right;
-                // 删除当前节点
                 BinaryNode *oldNode = t;
-                t = minNode; // 用分离出来的最小节点替换当前节点
+                t = minNode;
                 delete oldNode;
             }
+        }
+
+        if (t == nullptr)
+            return;
+
+        // 更新高度
+        updateHeight(t);
+
+        // 获取平衡因子
+        int balance = getBalance(t);
+
+        // 左左情况
+        if (balance > 1 && getBalance(t->left) >= 0)
+            t = rightRotate(t);
+
+        // 右右情况
+        if (balance < -1 && getBalance(t->right) <= 0)
+            t = leftRotate(t);
+
+        // 左右情况
+        if (balance > 1 && getBalance(t->left) < 0)
+        {
+            t->left = leftRotate(t->left);
+            t = rightRotate(t);
+        }
+
+        // 右左情况
+        if (balance < -1 && getBalance(t->right) > 0)
+        {
+            t->right = rightRotate(t->right);
+            t = leftRotate(t);
         }
     }
 

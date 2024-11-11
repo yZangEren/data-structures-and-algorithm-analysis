@@ -1,5 +1,5 @@
 all:
-	g++ main.cpp -o BinarySearchTree -std=c++20 -O2
+	g++ test.cpp -o BinarySearchTree -std=c++20 -O2
 
 run: all
 	./BinarySearchTree

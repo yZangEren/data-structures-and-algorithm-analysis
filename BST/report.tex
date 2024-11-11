@@ -19,159 +19,58 @@
 \usepackage{float, caption}
 
 \lstset{
-    basicstyle=\ttfamily, basewidth=0.5em,
-    breaklines=true,
-    numbers=left,
-    numberstyle=\tiny,
-    frame=single,
-    showstringspaces=false
+    basicstyle=\ttfamily, basewidth=0.5em
 }
 
 \begin{document}
 
 \pagestyle{fancy}
 \fancyhead{}
-\chead{二叉搜索树删除操作测试报告}
-\rhead{\today}
+\chead{数据结构与算法第六次作业}
+\rhead{Nov.11th, 2024}
 
-\section{测试程序的设计思路}
+\section{AVL树的删除操作实现}
 
-本测试程序主要针对二叉搜索树的删除操作进行全面测试，测试用例的设计覆盖了以下几个主要方面：
+在实现AVL树的删除操作时，我采用了以下策略：
 
+\subsection{基本删除流程}
+
+删除操作分为三种情况处理：
 \begin{enumerate}
-    \item 基础功能测试
-    \begin{itemize}
-        \item 空树的删除操作
-        \item 叶子节点的删除
-        \item 只有一个子节点的节点删除
-        \item 有两个子节点的节点删除
-    \end{itemize}
-    
-    \item 特殊情况测试
-    \begin{itemize}
-        \item 删除不存在的节点
-        \item 连续右子树的情况
-        \item 连续左子树的情况
-    \end{itemize}
-    
-    \item 完整性测试
-    \begin{itemize}
-        \item 删除所有节点
-        \item 树的空状态验证
-    \end{itemize}
+    \item 被删除节点是叶子节点或只有一个子节点：直接删除并重新连接
+    \item 被删除节点有两个子节点：
+        \begin{itemize}
+            \item 使用detachMin函数找到右子树中的最小节点
+            \item 将该最小节点替换到被删除节点的位置
+            \item 保持原有的左右子树连接关系
+        \end{itemize}
 \end{enumerate}
 
-\section{测试程序实现}
+\subsection{平衡维护}
 
-测试程序的核心代码如下：
-
-\begin{lstlisting}[language=C++]
-int main() {
-    BinarySearchTree<int> bst;
-
-    // 测试1：删除空树中的节点
-    bst.remove(10);
-
-    // 测试2：构建基本测试树
-    bst.insert(50);  // 根节点
-    bst.insert(30);  // 左子树
-    bst.insert(70);  // 右子树
-    bst.insert(20);  // 左左子树
-    bst.insert(40);  // 左右子树
-    bst.insert(60);  // 右左子树
-    bst.insert(80);  // 右右子树
-
-    // 测试3：删除叶子节点
-    bst.remove(20);
-
-    // 测试4：删除只有一个子节点的节点
-    bst.remove(30);
-
-    // 测试5：删除有两个子节点的节点
-    bst.remove(50);
-
-    // 后续测试...
-}
-\end{lstlisting}
-
-\section{测试结果分析}
-
-\subsection{基本功能测试结果}
+删除节点后，需要自底向上维护AVL树的平衡性：
 
 \begin{enumerate}
-    \item 空树测试（测试1）
-    \begin{lstlisting}
-=== 测试1：删除空树中的节点 ===
-树的内容：
-Empty tree
-是否为空：是
-    \end{lstlisting}
-    结果显示程序正确处理了空树的情况。
-
-    \item 树的构建（测试2）
-    \begin{lstlisting}
-=== 测试2：插入节点构建树 ===
-树的内容：
-20 30 40 50 60 70 80
-是否为空：否
-    \end{lstlisting}
-    中序遍历结果显示树的构建符合二叉搜索树的性质。
-
-    \item 删除操作测试（测试3-5）
-    \begin{itemize}
-        \item 叶子节点的删除（测试3）成功移除了节点20
-        \item 单子节点的删除（测试4）成功处理了节点30的删除
-        \item 双子节点的删除（测试5）正确处理了节点50的删除并保持了树的结构
-    \end{itemize}
+    \item 更新节点高度：计算左右子树的最大高度+1
+    \item 计算平衡因子：左子树高度减右子树高度
+    \item 根据平衡因子进行旋转操作：
+        \begin{itemize}
+            \item 左左情况(balance > 1 且左子树左偏)：右旋
+            \item 右右情况(balance < -1 且右子树右偏)：左旋
+            \item 左右情况(balance > 1 且左子树右偏)：先左旋后右旋
+            \item 右左情况(balance < -1 且右子树左偏)：先右旋后左旋
+        \end{itemize}
 \end{enumerate}
 
-\subsection{特殊情况测试结果}
+\subsection{实现优化}
 
+为了提高效率，我做了以下优化：
 \begin{enumerate}
-    \item 删除不存在节点（测试6）
-    \begin{lstlisting}
-=== 测试6：删除不存在的节点(100) ===
-树的内容：
-40 60 70 80
-是否为空：否
-    \end{lstlisting}
-    结果显示树的结构未受影响。
-
-    \item 特殊树结构测试（测试8-9）
-    \begin{lstlisting}
-=== 测试8：特殊情况 - 连续右子树 ===
-树的内容：
-10 20 30
-...
-=== 测试9：特殊情况 - 连续左子树 ===
-树的内容：
-10 20 30
-    \end{lstlisting}
-    结果显示程序能正确处理极端的树结构情况。
+    \item 使用detachMin而不是findMin，避免多余的节点复制
+    \item 在旋转操作中直接更新高度，减少重复计算
+    \item 仅在必要时进行平衡操作，避免不必要的旋转
 \end{enumerate}
 
-\section{改进建议}
-
-基于测试结果，提出以下改进建议：
-
-\begin{enumerate}
-    \item 添加层次遍历输出功能，以更直观地显示树的结构
-    \item 在删除操作后增加查找测试，验证树的查找功能完整性
-    \item 添加树高度验证，确保删除操作后树的平衡性
-    \item 增加更多边界测试用例
-\end{enumerate}
-
-\section{结论}
-
-通过全面的测试，我们可以得出以下结论：
-
-\begin{enumerate}
-    \item 删除操作能正确处理所有基本情况
-    \item 边界条件（空树、不存在节点）被正确处理
-    \item 特殊的树结构（连续左/右子树）也能正确处理
-    \item 删除操作后树始终保持二叉搜索树的性质
-\end{enumerate}
-
-测试结果表明二叉搜索树的删除操作实现是正确和可靠的。
+通过这种实现方式，确保了删除操作后树仍然保持AVL平衡特性，即任意节点的左右子树高度差不超过1。同时，通过优化的实现方式，保证了操作的效率。
 
 \end{document}
