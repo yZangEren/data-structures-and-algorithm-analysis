@@ -1,0 +1,115 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry, CJKutf8}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{float, caption}
+
+\lstset{
+    basicstyle=\ttfamily, basewidth=0.5em
+}
+
+% some common command
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\difFrac}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pdfFrac}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\OFL}{\mathrm{OFL}}
+\newcommand{\UFL}{\mathrm{UFL}}
+\newcommand{\fl}{\mathrm{fl}}
+\newcommand{\op}{\odot}
+\newcommand{\Eabs}{E_{\mathrm{abs}}}
+\newcommand{\Erel}{E_{\mathrm{rel}}}
+
+\begin{document}
+
+\pagestyle{fancy}
+\fancyhead{}
+\chead{堆排序算法实现与性能分析}
+\rhead{2024年12月1日}
+
+\section{设计思路}
+
+本次实现了基于最大堆的堆排序算法。主要包含两个核心函数：
+
+\begin{enumerate}
+    \item heapify：用于维护最大堆性质的核心函数
+    \item heapsort：主排序函数
+\end{enumerate}
+
+\subsection{核心函数实现}
+
+\begin{itemize}
+    \item heapify函数实现了"下沉"操作，确保以某个节点为根的子树满足最大堆性质
+    \item heapsort函数分两个阶段：
+        \begin{enumerate}
+            \item 建堆阶段：自底向上构建最大堆
+            \item 排序阶段：反复取出堆顶元素并重建堆
+        \end{enumerate}
+\end{itemize}
+
+\section{测试方案}
+
+测试程序设计了四种不同的输入序列：
+\begin{itemize}
+    \item 随机序列：使用随机数生成器生成
+    \item 有序序列：已经排好序的序列
+    \item 逆序序列：完全逆序的序列
+    \item 部分重复序列：有限范围内的随机数，确保存在重复元素
+\end{itemize}
+
+每种序列的测试规模均为100万个元素。
+
+\section{性能对比}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+序列类型 & my heapsort time(ms) & std::sort\_heap(ms) \\
+\hline
+随机序列 & 83 & 81 \\
+有序序列 & 51 & 33 \\
+逆序序列 & 50 & 37 \\
+部分重复序列 & 90 & 80 \\
+\hline
+\end{tabular}
+\caption{不同序列类型的排序性能对比}
+\end{table}
+
+\section{复杂度分析}
+
+\subsection{时间复杂度}
+\begin{itemize}
+    \item heapify操作：O(log n)
+    \item 建堆阶段：O(n)
+    \item 排序阶段：O(n log n)
+\end{itemize}
+
+整体时间复杂度为O(n log n)。
+
+\subsection{与std::sort\_heap的效率差异分析}
+
+从测试结果可以看出：
+\begin{enumerate}
+    \item 在随机序列和部分重复序列上，我的实现与标准库性能接近
+    \item 在有序和逆序序列上，标准库实现显著优于我的实现
+    \item 性能差异的主要原因：
+        \begin{itemize}
+            \item 我的实现使用递归的heapify，而标准库使用迭代实现
+        \end{itemize}
+\end{enumerate}
+
+\end{document}

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "BinarySearchTree.h"
+#include "BST.h"
 
 // 辅助函数：打印分隔线
 void printDivider(const std::string &message)
