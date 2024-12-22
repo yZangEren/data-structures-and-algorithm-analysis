@@ -1,0 +1,69 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{ctex}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\geometry{a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\title{表达式计算器设计与实现报告}
+\date{}
+\begin{document}
+\maketitle
+\section{项目概述}
+项目实现了一个支持基本四则运算、括号运算以及科学计数法的表达式计算器。计算器能够处理包含整数、小数、正负号和科学计数法的复杂数学表达式，并进行合法性验证。
+\section{设计思路}
+\subsection{表达式解析规则}
+算器支持以下表达式格式：
+\begin{itemize}
+   \item 基本运算符：+、-、*、/
+   \item 数字格式：整数、小数、科学计数法（如1e2、1.5e-3）
+   \item 括号运算：支持嵌套括号
+   \item 负号处理：支持表达式开头的负号和运算符后的负号
+\end{itemize}
+\subsection{合法性规则}
+\subsubsection{合法表达式示例}
+\begin{itemize}
+   \item \texttt{1+-2.1}：运算符后可以直接跟负号
+   \item \texttt{-1+2e2}：表达式开头可以是负号
+   \item \texttt{(1+2)*3}：支持括号优先级
+   \item \texttt{1.5e-3*2}：支持科学计数法
+\end{itemize}
+\subsubsection{非法表达式示例}
+\begin{itemize}
+   \item \texttt{1++2.1}：不允许连续的运算符
+   \item \texttt{1+(2}：括号不匹配
+   \item \texttt{1+2)}：括号不匹配
+   \item \texttt{+1+2}：表达式不能以运算符开头（负号除外）
+   \item \texttt{1/0}：除数不能为零
+   \item \texttt{1e2e3}：科学计数法格式错误
+\end{itemize}
+\section{测试结果分析}
+\subsection{测试用例设计}
+试用例覆盖了以下几个方面：
+\begin{itemize}
+   \item 基本四则运算测试
+   \item 括号嵌套测试
+   \item 小数运算测试
+   \item 负数处理测试
+   \item 科学计数法测试
+   \item 复杂表达式测试
+   \item 非法表达式测试
+\end{itemize}
+\subsection{测试结果}
+试程序共执行了27个测试用例，包括18个合法表达式和9个非法表达式。测试结果显示：
+\begin{itemize}
+   \item 所有测试用例均通过，测试通过率为100\%
+   \item 合法表达式计算结果与预期完全一致
+   \item 非法表达式均被正确识别并抛出异常
+   \item 计算精度控制在$10^{-10}$范围内
+\end{itemize}
+\subsection{特殊情况处理}
+\begin{itemize}
+   \item 科学计数法处理：正确解析如\texttt{1.5e2}、\texttt{-1e-2}等格式
+   \item 括号嵌套：支持多层括号嵌套，如\texttt{((1+1)*2)}
+   \item 优先级处理：正确处理运算符优先级，如\texttt{1+2*3+4}得到11
+   \item 异常处理：对除零、格式错误等异常情况进行了妥善处理
+\end{itemize}
+\section{结论}
+通过完整的测试验证，该计算器实现了预期的所有功能，能够准确处理各种合法表达式，并正确识别非法表达式。测试结果表明系统具有良好的稳定性和可靠性。
+\end{document}
